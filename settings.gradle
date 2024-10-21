@@ -1,0 +1,5 @@
+rootProject.name = 'milktea'
+
+include ':core', ':api'
+//project(':core').projectDir = file('../core')
+//project(':api').projectDir = file('../api')
