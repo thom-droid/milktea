@@ -9,9 +9,6 @@ subprojects {
         mavenCentral()
     }
 }
-//repositories {
-//    mavenCentral()
-//}
 
 group = 'com.millktea'
 version = '0.0.1-SNAPSHOT'
