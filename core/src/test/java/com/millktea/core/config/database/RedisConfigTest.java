@@ -1,5 +1,6 @@
 package com.millktea.core.config.database;
 
+import com.millktea.core.config.database.config.RedisTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,11 +10,11 @@ import org.springframework.data.redis.core.ValueOperations;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
+@SpringBootTest(classes = {RedisTestConfiguration.class})
 public class RedisConfigTest {
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Test
     void contextLoads() {
@@ -27,8 +28,8 @@ public class RedisConfigTest {
 
     @Test
     void redisTemplate() {
-        ValueOperations<String, String> opsForValue = redisTemplate.opsForValue();
-        opsForValue.set("test", "testValue");
+        ValueOperations<String, Object> opsForValue = redisTemplate.opsForValue();
+        opsForValue.set("test", "test");
         assertNotNull(opsForValue.get("test"));
     }
 }
