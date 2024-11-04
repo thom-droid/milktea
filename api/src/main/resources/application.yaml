@@ -1,3 +1,6 @@
 spring:
   application:
     name: milktea
+  web:
+    resources:
+      add-mappings: true
