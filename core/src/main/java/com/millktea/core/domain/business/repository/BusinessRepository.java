@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface BusinessRepository extends JpaRepository<Business, Long> {
 
     Optional<Business> findByBusinessNo(String businessNo);
-
 }

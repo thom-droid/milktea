@@ -2,6 +2,7 @@ package com.millktea.core.domain.business.repository;
 
 import com.millktea.core.config.database.config.JpaRepositoryTestConfiguration;
 import com.millktea.core.domain.business.entity.Business;
+import com.millktea.core.domain.business.entity.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ class BusinessRepositoryTest {
         business.setTelephoneNumber("010-1234-5678");
         business.setBusinessOwner("test business owner");
         business.setEmail("test@gmail.com");
+        business.setStatus(Status.ACTIVE);
 
         businessRepository.save(business);
     }

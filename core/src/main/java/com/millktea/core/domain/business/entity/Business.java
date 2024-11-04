@@ -1,13 +1,11 @@
 package com.millktea.core.domain.business.entity;
 
-import com.millktea.core.domain.users.entity.Users;
+import com.millktea.core.config.jpa.audit.Auditing;
+import com.millktea.core.domain.users.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
@@ -18,9 +16,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Builder
 @Table(name = "BUSINESS")
-public class Business {
+@Entity
+public class Business extends Auditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +56,13 @@ public class Business {
 
     private String logoSrc;
 
+    private String logoName;
+
+    @Builder.Default
+    private Status status = Status.ACTIVE;
+
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Users> usersList = new ArrayList<>();
+    @Builder.Default
+    private List<User> userList = new ArrayList<>();
 
 }

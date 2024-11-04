@@ -1,22 +1,26 @@
 package com.millktea.core.domain.users.entity;
 
+import com.millktea.core.config.jpa.converter.ListPrivilegeConverter;
 import com.millktea.core.domain.business.entity.Business;
+import com.millktea.core.domain.business.entity.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // 사용자 정보, 아이디, 비밀번호, 이름(담당자), 이메일, 회사정보, 권한
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(name = "USERS")
 @Entity
-public class Users {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +47,31 @@ public class Users {
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
     private String email;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @NotNull
+    @Convert(converter = ListPrivilegeConverter.class)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private List<Privilege> privileges = new ArrayList<>();
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Status status = Status.ACTIVE;
+
     @ManyToOne
     @JoinColumn(name = "business_id")
     private Business business;
+
+    public enum Role {
+        REPRESENTATIVE, USER
+    }
+
+    public enum Privilege {
+        WRITE, READ, MODIFY, DELETE, ALL
+    }
 
 }
