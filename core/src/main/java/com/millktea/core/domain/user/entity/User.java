@@ -1,5 +1,6 @@
-package com.millktea.core.domain.users.entity;
+package com.millktea.core.domain.user.entity;
 
+import com.millktea.core.config.jpa.audit.Auditing;
 import com.millktea.core.config.jpa.converter.ListPrivilegeConverter;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.entity.Status;
@@ -20,7 +21,7 @@ import java.util.List;
 @Builder
 @Table(name = "USERS")
 @Entity
-public class User {
+public class User extends Auditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,13 +1,13 @@
 package com.millktea.core.config.jpa.converter;
 
-import com.millktea.core.domain.users.entity.User;
-import com.millktea.core.domain.users.entity.User.Privilege;
+import com.millktea.core.domain.user.entity.User;
+import com.millktea.core.domain.user.entity.User.Privilege;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.millktea.core.domain.users.entity.User.Privilege.READ;
-import static com.millktea.core.domain.users.entity.User.Privilege.WRITE;
+import static com.millktea.core.domain.user.entity.User.Privilege.READ;
+import static com.millktea.core.domain.user.entity.User.Privilege.WRITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ListPrivilegeConverterTest {

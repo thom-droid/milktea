@@ -1,6 +1,6 @@
 package com.millktea.core.config.jpa.converter;
 
-import com.millktea.core.domain.users.entity.User;
+import com.millktea.core.domain.user.entity.User;
 import jakarta.persistence.Converter;
 
 @Converter

@@ -2,7 +2,7 @@ package com.millktea.core.help.stub;
 
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.entity.Status;
-import com.millktea.core.domain.users.entity.User;
+import com.millktea.core.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

@@ -1,6 +1,6 @@
 package com.millktea.core.help.stub;
 
-import com.millktea.core.domain.users.entity.User;
+import com.millktea.core.domain.user.entity.User;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
