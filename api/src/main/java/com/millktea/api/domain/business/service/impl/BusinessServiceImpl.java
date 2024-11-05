@@ -28,23 +28,22 @@ public class BusinessServiceImpl implements BusinessService {
         // TODO:: logic
     }
 
+    @Override
     public Business getBusiness(String businessNo) {
         return getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
     }
 
     private void throwIfAlreadyExist(String businessNo) {
-        if (businessExists(businessNo)) throw new BusinessRuntimeException(BUSINESS_ALREADY_EXISTS);
+        getOptional(businessNo).ifPresent(business -> {
+            throw new BusinessRuntimeException(BUSINESS_ALREADY_EXISTS);});
     }
 
     private void throwIfNotFound(String businessNo) {
-        if (!businessExists(businessNo)) throw new BusinessRuntimeException(BUSINESS_NOT_FOUND);
+        getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
     }
 
     public Optional<Business> getOptional(String businessNo) {
         return businessRepository.findByBusinessNo(businessNo);
     }
 
-    public boolean businessExists(String businessNo) {
-        return getOptional(businessNo).isPresent();
-    }
 }
