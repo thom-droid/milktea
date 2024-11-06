@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(scanBasePackages = {"com.millktea.api", "com.millktea.core"})
-@EnableJpaRepositories(basePackages = {"com.millktea.core.repository"})
+@EnableJpaRepositories(basePackages = {"com.millktea.core.domain"})
 @EntityScan(basePackages = {"com.millktea.core.domain"})
 public class MilkteaApplication {
 

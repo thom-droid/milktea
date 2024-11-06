@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest(classes = {RedisTestConfiguration.class})
+@SpringBootTest(classes = {DatabaseConfig.class, RedisTestConfiguration.class})
 public class RedisConfigTest {
 
     @Autowired

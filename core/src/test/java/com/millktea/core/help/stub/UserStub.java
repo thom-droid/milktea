@@ -16,6 +16,7 @@ public class UserStub {
                 .email("test@exmple.com")
                 .role(User.Role.USER)
                 .privileges(List.of(User.Privilege.ALL))
+                .business(BusinessStub.createBusinessStub())
                 .build();
     }
 

@@ -3,6 +3,7 @@ package com.millktea.core.config.database;
 import com.millktea.core.config.database.config.DatabaseTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
@@ -18,7 +19,7 @@ class DatabaseConfigTest {
     private ApplicationContext ctx;
 
     @Autowired
-    private DataSource dataSource;
+    DataSource dataSource;
 
     @Test
     void contextLoads() {
