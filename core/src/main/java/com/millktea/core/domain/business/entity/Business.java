@@ -40,9 +40,11 @@ public class Business extends Auditing {
 
     private String email;
 
-    private String logoSrc;
+    @Builder.Default
+    private String logoSrc = "/icons/img/logo-default.png";
 
-    private String logoName;
+    @Builder.Default
+    private String logoName = "default-logo.png";
 
     @Builder.Default
     private Status status = Status.ACTIVE;

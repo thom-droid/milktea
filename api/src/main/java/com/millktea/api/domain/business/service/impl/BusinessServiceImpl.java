@@ -1,6 +1,7 @@
 package com.millktea.api.domain.business.service.impl;
 
 import com.millktea.api.domain.business.service.BusinessService;
+import com.millktea.api.domain.file.FileStorageService;
 import com.millktea.api.exception.BusinessRuntimeException;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.repository.BusinessRepository;
@@ -18,14 +19,24 @@ import static com.millktea.api.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
 public class BusinessServiceImpl implements BusinessService {
 
     private final BusinessRepository businessRepository;
+    private final FileStorageService fileStorageService;
 
-    public Long saveBusiness(Business business) {
+    public Long saveBusiness(Business business, MultipartFile image) {
         throwIfAlreadyExist(business.getBusinessNo());
+        processImageIfExist(business, image);
         return businessRepository.save(business).getId();
     }
 
     private void processImageIfExist(Business business, MultipartFile img) {
-        // TODO:: logic
+        String logoSrc;
+        String logoName;
+
+        if (img != null) {
+            logoSrc = fileStorageService.storeFile(img);
+            logoName = img.getOriginalFilename();
+            business.setLogoSrc(logoSrc);
+            business.setLogoName(logoName);
+        }
     }
 
     @Override
