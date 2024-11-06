@@ -11,7 +11,7 @@ import static com.millktea.core.domain.user.entity.User.Privilege.WRITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ListPrivilegeConverterTest {
-    ListPrivilegeConverter listPrivilegeConverter = new ListPrivilegeConverter(User.Privilege.class);
+    ListPrivilegeConverter listPrivilegeConverter = new ListPrivilegeConverter();
 
     @Test
     void convertToDatabaseColumn() {

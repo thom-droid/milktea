@@ -53,8 +53,8 @@ public class User extends Auditing {
     private Role role;
 
     @NotNull
+    @Column(nullable = false)
     @Convert(converter = ListPrivilegeConverter.class)
-    @Enumerated(EnumType.STRING)
     @Builder.Default
     private List<Privilege> privileges = new ArrayList<>();
 
