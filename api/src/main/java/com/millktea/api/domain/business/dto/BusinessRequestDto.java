@@ -26,7 +26,7 @@ public class BusinessRequestDto {
 
         @NotNull
         @Length(max = 100)
-        private String businessOwner;
+        private String representative;
 
         @Column(length = 100)
         @Length(max = 100)
@@ -48,7 +48,7 @@ public class BusinessRequestDto {
             return Business.builder()
                     .businessNo(this.businessNo)
                     .name(this.name)
-                    .businessOwner(this.businessOwner)
+                    .representative(this.representative)
                     .addr(this.addr)
                     .telephoneNumber(this.telephoneNumber)
                     .email(this.email)

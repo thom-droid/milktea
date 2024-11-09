@@ -1,4 +1,4 @@
-package com.millktea.api.exception;
+package com.millktea.core.exception;
 
 import lombok.Getter;
 

@@ -1,5 +1,7 @@
-package com.millktea.core.help.stub;
+package com.milktea.stub.buisness;
 
+import com.milktea.stub.helper.random.CompanyNameGenerator;
+import com.milktea.stub.helper.random.NameGenerator;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.entity.Status;
 import com.millktea.core.domain.user.entity.User;
@@ -14,8 +16,8 @@ public class BusinessStub {
     public static Business createBusinessStub() {
         return Business.builder()
                 .businessNo(createRandomBusinessNo())
-                .name("Test Business")
-                .businessOwner("Test Owner")
+                .name(CompanyNameGenerator.getInstance().generate())
+                .representative(NameGenerator.getInstance().generate())
                 .addr("123 Test Street")
                 .telephoneNumber("010-1234-5678")
                 .email("test@example.com")

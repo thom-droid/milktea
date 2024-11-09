@@ -2,11 +2,10 @@ package com.millktea.core.domain.business.entity;
 
 import com.millktea.core.config.jpa.audit.Auditing;
 import com.millktea.core.domain.user.entity.User;
+import com.millktea.core.exception.BusinessRuntimeException;
+import com.millktea.core.exception.RuntimeErrorCode;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class Business extends Auditing {
     private String name;
 
     @Column(nullable = false, length = 100)
-    private String businessOwner;
+    private String representative;
 
     private String addr;
 
@@ -52,5 +51,35 @@ public class Business extends Auditing {
     @OneToMany(mappedBy = "business", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<User> userList = new ArrayList<>();
+
+    public void addUser(User user) {
+        if (!userList.contains(user) ) {
+            userList.add(user);
+            user.setBusiness(this);
+        }
+    }
+
+    public boolean hasUsers() {
+        return !userList.isEmpty();
+    }
+
+    public boolean hasRepresentative() {
+        return userList.stream().anyMatch(User::isRepresentative);
+    }
+
+    public User getRepresentativeUser() {
+        return userList.stream()
+                .filter(User::isRepresentative)
+                .findFirst()
+                .orElseThrow(() -> new BusinessRuntimeException(RuntimeErrorCode.BUSINESS_HAS_NO_REPRESENTATIVE_USER));
+    }
+
+    public boolean isRepresentativeUser(User user) {
+        return getRepresentativeUser().equals(user);
+    }
+
+    public void checkRepresentativeUser(User user) {
+        if (!isRepresentativeUser(user)) throw new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_REPRESENTATIVE);
+    }
 
 }

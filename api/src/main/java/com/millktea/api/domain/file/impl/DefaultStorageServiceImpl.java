@@ -1,7 +1,7 @@
 package com.millktea.api.domain.file.impl;
 
 import com.millktea.api.domain.file.FileStorageService;
-import com.millktea.api.exception.BusinessRuntimeException;
+import com.millktea.core.exception.BusinessRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
-import static com.millktea.api.exception.RuntimeErrorCode.*;
+import static com.millktea.core.exception.RuntimeErrorCode.*;
 
 @Slf4j
 @Service

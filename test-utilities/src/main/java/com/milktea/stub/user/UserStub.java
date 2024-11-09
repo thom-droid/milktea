@@ -1,5 +1,6 @@
-package com.millktea.core.help.stub;
+package com.milktea.stub.user;
 
+import com.milktea.stub.buisness.BusinessStub;
 import com.millktea.core.domain.user.entity.User;
 import lombok.NoArgsConstructor;
 

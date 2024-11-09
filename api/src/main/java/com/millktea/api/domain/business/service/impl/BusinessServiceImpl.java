@@ -1,8 +1,9 @@
 package com.millktea.api.domain.business.service.impl;
 
+import com.millktea.api.domain.business.mapper.BusinessMapper;
 import com.millktea.api.domain.business.service.BusinessService;
 import com.millktea.api.domain.file.FileStorageService;
-import com.millktea.api.exception.BusinessRuntimeException;
+import com.millktea.core.exception.BusinessRuntimeException;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.repository.BusinessRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
-import static com.millktea.api.exception.RuntimeErrorCode.BUSINESS_ALREADY_EXISTS;
-import static com.millktea.api.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
+import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_ALREADY_EXISTS;
+import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
+
+// TODO 인증 인가로직으로 유저 권한 확인
 
 @RequiredArgsConstructor
 @Service
@@ -20,11 +23,36 @@ public class BusinessServiceImpl implements BusinessService {
 
     private final BusinessRepository businessRepository;
     private final FileStorageService fileStorageService;
+    private final BusinessMapper businessMapper;
 
-    public Long saveBusiness(Business business, MultipartFile image) {
+    @Override
+    public Long save(Business business, MultipartFile image) {
         throwIfAlreadyExist(business.getBusinessNo());
         processImageIfExist(business, image);
         return businessRepository.save(business).getId();
+    }
+
+    public Optional<Business> getOptional(String businessNo) {
+        return businessRepository.findByBusinessNo(businessNo);
+    }
+
+    @Override
+    public Long update(Business source, MultipartFile image) {
+        getOptional(source.getBusinessNo())
+                .ifPresentOrElse(target -> {
+                            businessMapper.updateEntityFromSource(target, source);
+                            updateBusiness(target, image);
+                        },
+                        () -> {
+                            throw new BusinessRuntimeException(BUSINESS_NOT_FOUND);
+                        }
+                );
+        return source.getId();
+    }
+
+    private void updateBusiness(Business business, MultipartFile image) {
+        processImageIfExist(business, image);
+        businessRepository.save(business);
     }
 
     private void processImageIfExist(Business business, MultipartFile img) {
@@ -40,7 +68,7 @@ public class BusinessServiceImpl implements BusinessService {
     }
 
     @Override
-    public Business getBusiness(String businessNo) {
+    public Business getOne(String businessNo) {
         return getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
     }
 
@@ -51,10 +79,6 @@ public class BusinessServiceImpl implements BusinessService {
 
     private void throwIfNotFound(String businessNo) {
         getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
-    }
-
-    public Optional<Business> getOptional(String businessNo) {
-        return businessRepository.findByBusinessNo(businessNo);
     }
 
 }

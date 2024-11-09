@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Optional;
@@ -28,7 +27,7 @@ class BusinessRepositoryTest {
         business.setName("test business name");
         business.setAddr("test business address");
         business.setTelephoneNumber("010-1234-5678");
-        business.setBusinessOwner("test business owner");
+        business.setRepresentative("test business owner");
         business.setEmail("test@gmail.com");
         business.setStatus(Status.ACTIVE);
 
@@ -50,7 +49,7 @@ class BusinessRepositoryTest {
             assertThat(b.getName()).isEqualTo("test business name");
             assertThat(b.getAddr()).isEqualTo("test business address");
             assertThat(b.getTelephoneNumber()).isEqualTo("010-1234-5678");
-            assertThat(b.getBusinessOwner()).isEqualTo("test business owner");
+            assertThat(b.getRepresentative()).isEqualTo("test business owner");
             assertThat(b.getEmail()).isEqualTo("test@gmail.com");
         });
 

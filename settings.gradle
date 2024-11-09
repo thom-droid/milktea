@@ -1,4 +1,5 @@
 rootProject.name = 'milktea'
 
 include ':api', ':core'
+include 'test-utilities'
 

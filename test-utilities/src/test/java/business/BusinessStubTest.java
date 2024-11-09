@@ -1,5 +1,6 @@
-package com.millktea.core.help.stub;
+package business;
 
+import com.milktea.stub.buisness.BusinessStub;
 import com.millktea.core.domain.business.entity.Business;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -75,4 +75,13 @@ public class User extends Auditing {
         WRITE, READ, MODIFY, DELETE, ALL
     }
 
+    public void addBusiness(Business business) {
+        this.business = business;
+        business.addUser(this);
+    }
+
+    public boolean isRepresentative() {
+        return role == Role.REPRESENTATIVE;
+    }
+
 }

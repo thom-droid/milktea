@@ -4,7 +4,7 @@ import com.millktea.core.config.database.config.JpaRepositoryTestConfiguration;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.repository.BusinessRepository;
 import com.millktea.core.domain.user.entity.User;
-import com.millktea.core.help.stub.UserStub;
+import com.milktea.stub.user.UserStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
