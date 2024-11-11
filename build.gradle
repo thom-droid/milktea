@@ -51,7 +51,7 @@ project(':api') {
 
     dependencies {
         implementation project(':core')
-        implementation project(':test-utilities')
+        testImplementation project(':test-utilities')
     }
 
     bootJar {
