@@ -84,4 +84,12 @@ public class User extends Auditing {
         return role == Role.REPRESENTATIVE;
     }
 
+    public void deactivate() {
+        this.status = Status.INACTIVE;
+    }
+
+    public boolean isActive() {
+        return this.status == Status.ACTIVE;
+    }
+
 }

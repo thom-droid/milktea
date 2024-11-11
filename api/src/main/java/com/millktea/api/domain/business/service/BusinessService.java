@@ -11,4 +11,6 @@ public interface BusinessService {
 
     Long update(Business business, MultipartFile image);
 
+    void deactivate(Business business);
+
 }

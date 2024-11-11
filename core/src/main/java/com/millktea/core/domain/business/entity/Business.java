@@ -59,6 +59,15 @@ public class Business extends Auditing {
         }
     }
 
+    public boolean isActive() {
+        return this.status == Status.ACTIVE;
+    }
+
+    public void deactivate() {
+        this.status = Status.INACTIVE;
+        this.userList.forEach(User::deactivate);
+    }
+
     public boolean hasUsers() {
         return !userList.isEmpty();
     }

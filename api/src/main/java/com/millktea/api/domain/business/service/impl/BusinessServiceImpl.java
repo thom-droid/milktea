@@ -16,7 +16,7 @@ import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_ALREADY_EXIS
 import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
 
 // TODO 인증 인가로직으로 유저 권한 확인
-
+// annotation 활용
 @RequiredArgsConstructor
 @Service
 public class BusinessServiceImpl implements BusinessService {
@@ -30,10 +30,6 @@ public class BusinessServiceImpl implements BusinessService {
         throwIfAlreadyExist(business.getBusinessNo());
         processImageIfExist(business, image);
         return businessRepository.save(business).getId();
-    }
-
-    public Optional<Business> getOptional(String businessNo) {
-        return businessRepository.findByBusinessNo(businessNo);
     }
 
     @Override
@@ -50,9 +46,31 @@ public class BusinessServiceImpl implements BusinessService {
         return source.getId();
     }
 
+    @Override
+    public Business getOne(String businessNo) {
+        return getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
+    }
+
+    @Override
+    public void deactivate(Business business) {
+        getOptional(business.getBusinessNo()).ifPresentOrElse(
+                entity -> {
+                    entity.deactivate();
+                    businessRepository.save(entity);
+                },
+                () -> {
+                    throw new BusinessRuntimeException(BUSINESS_NOT_FOUND);
+                }
+        );
+    }
+
     private void updateBusiness(Business business, MultipartFile image) {
         processImageIfExist(business, image);
         businessRepository.save(business);
+    }
+
+    public Optional<Business> getOptional(String businessNo) {
+        return businessRepository.findByBusinessNo(businessNo);
     }
 
     private void processImageIfExist(Business business, MultipartFile img) {
@@ -65,11 +83,6 @@ public class BusinessServiceImpl implements BusinessService {
             business.setLogoSrc(logoSrc);
             business.setLogoName(logoName);
         }
-    }
-
-    @Override
-    public Business getOne(String businessNo) {
-        return getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
     }
 
     private void throwIfAlreadyExist(String businessNo) {

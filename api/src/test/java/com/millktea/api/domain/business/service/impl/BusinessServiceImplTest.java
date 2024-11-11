@@ -1,6 +1,7 @@
 package com.millktea.api.domain.business.service.impl;
 
 import com.milktea.stub.buisness.BusinessStub;
+import com.milktea.stub.user.UserStub;
 import com.millktea.api.config.domain.business.BusinessTestConfig;
 import com.millktea.api.domain.business.dto.BusinessRequestDto;
 import com.millktea.api.domain.business.mapper.BusinessMapper;
@@ -9,6 +10,7 @@ import com.millktea.api.domain.file.FileStorageService;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.entity.Status;
 import com.millktea.core.domain.business.repository.BusinessRepository;
+import com.millktea.core.domain.user.entity.User;
 import com.millktea.core.exception.BusinessRuntimeException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_ALREADY_EXISTS;
@@ -130,6 +133,24 @@ class BusinessServiceImplTest {
         //then
         assertDoesNotThrow(() -> throwsIfNotTheSame(entity, source));
         assertThat(entity.getLogoName()).isEqualTo(mockMultipartFile.getOriginalFilename());
+    }
+
+    @Test
+    void whenDeactivateBusinessThenBusinessAndAllUsersDeactivated() {
+
+        //given
+        User representative = UserStub.createUserStub(User.Role.REPRESENTATIVE);
+        User user = UserStub.createUserStub();
+        Business business = BusinessStub.createBusinessWithUsersStub(List.of(representative, user));
+
+        //when
+        when(businessRepository.findByBusinessNo(business.getBusinessNo())).thenReturn(Optional.of(business));
+        when(businessRepository.save(Mockito.mock(Business.class))).thenReturn(Mockito.any(Business.class));
+
+        //then
+        assertDoesNotThrow(() -> businessService.deactivate(business));
+        assertThat(business.isActive()).isFalse();
+        business.getUserList().forEach(u -> assertThat(u.isActive()).isFalse());
     }
 
     private void throwsIfNotTheSame(Business entity, Business source) {
