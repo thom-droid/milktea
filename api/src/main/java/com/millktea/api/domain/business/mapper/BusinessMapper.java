@@ -13,8 +13,13 @@ public interface BusinessMapper {
     Business toEntityFrom(BusinessRequestDto.Post dto);
 
     @BeanMapping(
-            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-            ignoreByDefault = true
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
     )
+    @Mapping(target = "representative", source = "representative")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "addr", source = "addr")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "telephoneNumber", source = "telephoneNumber")
     void updateEntityFromSource(@MappingTarget Business entity, Business source);
 }

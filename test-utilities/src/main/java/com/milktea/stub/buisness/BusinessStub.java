@@ -27,6 +27,11 @@ public class BusinessStub {
                 .build();
     }
 
+    public static Business createEmptyBusinessStub() {
+        return new Business();
+
+    }
+
     public static Business createBusinessWithUsersStub(List<User> users) {
         Business business = createBusinessStub();
         business.setUserList(users);

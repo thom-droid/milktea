@@ -63,7 +63,7 @@ public class Business extends Auditing {
         return !userList.isEmpty();
     }
 
-    public boolean hasRepresentative() {
+    public boolean hasRepresentativeUser() {
         return userList.stream().anyMatch(User::isRepresentative);
     }
 
