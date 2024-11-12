@@ -31,7 +31,7 @@ public class User extends Auditing {
     @Column(nullable = false, length = 50)
     @NotNull
     @Length(max = 50)
-    private String userId;
+    private String username;
 
     @Column(nullable = false, length = 100)
     @NotNull

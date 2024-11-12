@@ -15,7 +15,7 @@ public class UserStub {
      */
     public static User createUserStub() {
         return User.builder()
-                .userId("test")
+                .username("test")
                 .password("test")
                 .name(NameGenerator.getInstance().generate())
                 .email("test@exmple.com")
@@ -33,7 +33,7 @@ public class UserStub {
     public static User createUserStub(User.Role role) {
         if (role == null) return createUserStub();
         return User.builder()
-                .userId("test")
+                .username("test")
                 .password(createRandomPassword())
                 .name(NameGenerator.getInstance().generate())
                 .email("test@example.com")

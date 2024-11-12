@@ -5,11 +5,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface BusinessService {
 
-    Long save(Business business, MultipartFile image);
+    Business save(Business business, MultipartFile image);
 
     Business getOne(String businessNo);
 
-    Long update(Business business, MultipartFile image);
+    Business update(Business business, MultipartFile image);
 
     void deactivate(Business business);
 

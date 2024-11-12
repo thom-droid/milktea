@@ -26,14 +26,14 @@ public class BusinessServiceImpl implements BusinessService {
     private final BusinessMapper businessMapper;
 
     @Override
-    public Long save(Business business, MultipartFile image) {
+    public Business save(Business business, MultipartFile image) {
         throwIfAlreadyExist(business.getBusinessNo());
         processImageIfExist(business, image);
-        return businessRepository.save(business).getId();
+        return businessRepository.save(business);
     }
 
     @Override
-    public Long update(Business source, MultipartFile image) {
+    public Business update(Business source, MultipartFile image) {
         getOptional(source.getBusinessNo())
                 .ifPresentOrElse(target -> {
                             businessMapper.updateEntityFromSource(target, source);
@@ -43,7 +43,7 @@ public class BusinessServiceImpl implements BusinessService {
                             throw new BusinessRuntimeException(BUSINESS_NOT_FOUND);
                         }
                 );
-        return source.getId();
+        return source;
     }
 
     @Override

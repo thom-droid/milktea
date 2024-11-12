@@ -87,7 +87,7 @@ public class Business extends Auditing {
         return getRepresentativeUser().equals(user);
     }
 
-    public void checkRepresentativeUser(User user) {
+    public void checkIfRepresentativeUser(User user) {
         if (!isRepresentativeUser(user)) throw new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_REPRESENTATIVE);
     }
 

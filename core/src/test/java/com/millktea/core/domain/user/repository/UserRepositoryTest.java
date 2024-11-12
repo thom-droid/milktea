@@ -46,11 +46,11 @@ class UserRepositoryTest {
         assertDoesNotThrow(() -> businessRepository.save(business));
         assertDoesNotThrow(() -> userRepository.save(userStub));
 
-        Optional<User> user = userRepository.findByNameAndPassword(userStub.getUserId(), userStub.getPassword());
+        Optional<User> user = userRepository.findByUsernameAndPassword(userStub.getUsername(), userStub.getPassword());
         assertThat(user.isPresent()).isTrue();
 
         user.ifPresent(u -> {
-            assertThat(u.getName()).isEqualTo("test");
+            assertThat(u.getName()).isEqualTo(userStub.getName());
             assertThat(u.getPassword()).isEqualTo("test");
         });
 

@@ -1,9 +1,10 @@
 package com.millktea.api.domain.business.service.impl;
 
 import com.milktea.stub.buisness.BusinessStub;
+import com.milktea.stub.helper.comparator.BusinessComparator;
 import com.milktea.stub.user.UserStub;
 import com.millktea.api.config.domain.business.BusinessTestConfig;
-import com.millktea.api.domain.business.dto.BusinessRequestDto;
+import com.millktea.api.domain.business.dto.SaveBusinessReq;
 import com.millktea.api.domain.business.mapper.BusinessMapper;
 import com.millktea.api.domain.business.service.BusinessService;
 import com.millktea.api.domain.file.FileStorageService;
@@ -22,14 +23,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.util.List;
 import java.util.Optional;
 
+import static com.milktea.stub.helper.comparator.BusinessComparator.throwsIfNotTheSameObjects;
 import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_ALREADY_EXISTS;
 import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.throwable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = BusinessTestConfig.class)
@@ -50,7 +49,7 @@ class BusinessServiceImplTest {
     @Test
     void saveBusiness() {
         // given
-        Business business = BusinessRequestDto.Post.builder()
+        Business business = SaveBusinessReq.builder()
                 .businessNo("1234")
                 .representative("test")
                 .addr("test")
@@ -67,15 +66,15 @@ class BusinessServiceImplTest {
         when(fileStorageService.storeFile(mockMultipartFile)).thenReturn("test.jpg");
 
         //then
-        Long businessId = assertDoesNotThrow(() -> businessService.save(business, mockMultipartFile));
-        assertThat(businessId).isEqualTo(1L);
+        Business savedBusiness = assertDoesNotThrow(() -> businessService.save(business, mockMultipartFile));
+        assertThat(savedBusiness.getId()).isEqualTo(1L);
     }
 
     @Test
     void givenBusinessNoAlreadyExistWhenSavingThenThrows() {
 
         // given
-        Business business = BusinessRequestDto.Post.builder()
+        Business business = SaveBusinessReq.builder()
                 .businessNo("1234")
                 .representative("test")
                 .addr("test")
@@ -131,13 +130,12 @@ class BusinessServiceImplTest {
         assertDoesNotThrow(() -> businessService.update(source, mockMultipartFile));
 
         //then
-        assertDoesNotThrow(() -> throwsIfNotTheSame(entity, source));
+        assertDoesNotThrow(() -> throwsIfNotTheSameObjects(entity, source));
         assertThat(entity.getLogoName()).isEqualTo(mockMultipartFile.getOriginalFilename());
     }
 
     @Test
     void whenDeactivateBusinessThenBusinessAndAllUsersDeactivated() {
-
         //given
         User representative = UserStub.createUserStub(User.Role.REPRESENTATIVE);
         User user = UserStub.createUserStub();
@@ -151,18 +149,6 @@ class BusinessServiceImplTest {
         assertDoesNotThrow(() -> businessService.deactivate(business));
         assertThat(business.isActive()).isFalse();
         business.getUserList().forEach(u -> assertThat(u.isActive()).isFalse());
-    }
-
-    private void throwsIfNotTheSame(Business entity, Business source) {
-        boolean equals = entity.getBusinessNo().equals(source.getBusinessNo()) &&
-                entity.getRepresentative().equals(source.getRepresentative()) &&
-                entity.getEmail().equals(source.getEmail()) &&
-                entity.getName().equals(source.getName()) &&
-                entity.getAddr().equals(source.getAddr()) &&
-                entity.getStatus() == source.getStatus() &&
-                entity.getTelephoneNumber().equals(source.getTelephoneNumber());
-
-        if (!equals) throw new RuntimeException("Not equal");
     }
 
 }
