@@ -37,10 +37,11 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findByNameAndPassword() {
+    void findByBusinessNoAndUsernameAndPassword() {
         //given
         User userStub = UserStub.createUserStub();
         Business business = userStub.getBusiness();
+        business.addUser(userStub);
 
         //then
         assertDoesNotThrow(() -> businessRepository.save(business));

@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //사업자번호, 대표자명, 주소, 전화번호, 이메일, 회사 로고
 @Getter
@@ -20,6 +21,7 @@ import java.util.List;
 @Entity
 public class Business extends Auditing {
 
+    @EqualsAndHashCode.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -76,19 +78,14 @@ public class Business extends Auditing {
         return userList.stream().anyMatch(User::isRepresentative);
     }
 
-    public User getRepresentativeUser() {
+    public Optional<User> getRepresentativeUser() {
         return userList.stream()
                 .filter(User::isRepresentative)
-                .findFirst()
-                .orElseThrow(() -> new BusinessRuntimeException(RuntimeErrorCode.BUSINESS_HAS_NO_REPRESENTATIVE_USER));
+                .findFirst();
     }
 
     public boolean isRepresentativeUser(User user) {
-        return getRepresentativeUser().equals(user);
-    }
-
-    public void checkIfRepresentativeUser(User user) {
-        if (!isRepresentativeUser(user)) throw new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_REPRESENTATIVE);
+        return getRepresentativeUser().map(u -> u.equals(user)).orElse(false);
     }
 
 }

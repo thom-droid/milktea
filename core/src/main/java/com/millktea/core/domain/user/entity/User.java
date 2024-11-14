@@ -5,10 +5,7 @@ import com.millktea.core.config.jpa.converter.ListPrivilegeConverter;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.entity.Status;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,42 +20,35 @@ import java.util.List;
 @Entity
 public class User extends Auditing {
 
+    @EqualsAndHashCode.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false, length = 50)
-    @NotNull
-    @Length(max = 50)
     private String username;
 
     @Column(nullable = false, length = 100)
-    @NotNull
-    @Length(max = 100)
     private String password;
 
     @Column(nullable = false, length = 20)
-    @NotNull
-    @Length(max = 20)
     private String name;
 
     @Column(nullable = false, length = 100)
-    @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
     private String email;
 
-    @NotNull
+    @Column(nullable = false, length = 20)
+    private String phone;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @NotNull
     @Column(nullable = false)
     @Convert(converter = ListPrivilegeConverter.class)
     @Builder.Default
     private List<Privilege> privileges = new ArrayList<>();
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Status status = Status.ACTIVE;
@@ -92,4 +82,7 @@ public class User extends Auditing {
         return this.status == Status.ACTIVE;
     }
 
+    public void setDefaultRoleDependingOnRole() {
+        privileges = role == Role.REPRESENTATIVE ? List.of(Privilege.ALL) : List.of(Privilege.READ);
+    }
 }

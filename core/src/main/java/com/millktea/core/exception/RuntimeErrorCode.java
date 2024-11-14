@@ -11,6 +11,7 @@ public enum RuntimeErrorCode {
     BUSINESS_ALREADY_EXISTS(1001, "Business already exists"),
     BUSINESS_NOT_ACTIVE(1002, "Business not active"),
     BUSINESS_HAS_NO_REPRESENTATIVE_USER(1003, "Business has no representative user"),
+    BUSINESS_ALREADY_HAS_REPRESENTATIVE_USER(1004, "Business already has representative user"),
 
     USER_NOT_FOUND(2000, "User not found"),
     USER_ALREADY_EXISTS(2001, "User already exists"),
