@@ -54,4 +54,19 @@ class UserMapperTest {
         assertEquals(saveUserRes.getStatus(), userStub.getStatus());
     }
 
+    @Test
+    void updateEntityFromSource() {
+        // given
+        User userStub = UserStub.createUserStub();
+        SaveUserReq saveUserReq = UserReqStub.createSaveUserReq(User.Role.REPRESENTATIVE);
+
+        // when
+        userMapper.updateEntityFromSource(userStub, userMapper.toEntityFrom(saveUserReq));
+
+        // then
+        assertEquals(userStub.getName(), saveUserReq.getName());
+        assertEquals(userStub.getEmail(), saveUserReq.getEmail());
+        assertEquals(userStub.getPhone(), saveUserReq.getPhone());
+    }
+
 }

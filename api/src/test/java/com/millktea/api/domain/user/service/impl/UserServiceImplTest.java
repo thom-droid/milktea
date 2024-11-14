@@ -117,4 +117,21 @@ class UserServiceImplTest {
         Mockito.verify(userRepository, Mockito.times(1)).save(userStub);
     }
 
+    @Test
+    void givenUser_whenPatch_thenSuccess() {
+        //given
+        User entity = UserStub.createUserStub(User.Role.REPRESENTATIVE);
+        User source = UserStub.createUserStub(User.Role.REPRESENTATIVE);
+        userMapper.updateEntityFromSource(entity, source);
+
+        //when
+        Mockito.when(userRepository.findByUsernameAndPassword(source.getUsername(), source.getPassword())).thenReturn(Optional.of(entity));
+        Mockito.when(userRepository.save(entity)).thenReturn(entity);
+
+        //then
+        assertDoesNotThrow(() -> userService.patch(source));
+        Mockito.verify(userRepository, Mockito.times(1)).findByUsernameAndPassword(source.getUsername(), source.getPassword());
+        Mockito.verify(userRepository, Mockito.times(1)).save(entity);
+    }
+
 }

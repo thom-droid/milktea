@@ -1,6 +1,7 @@
 package com.millktea.api.domain.user.service.impl;
 
 import com.millktea.api.domain.business.service.BusinessService;
+import com.millktea.api.domain.user.mapper.UserMapper;
 import com.millktea.api.domain.user.service.UserService;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.user.entity.User;
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BusinessService businessService;
+    private final UserMapper userMapper;
 
     @Override
     public User save(String businessNo, User user) {
@@ -31,9 +33,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    // TODO 인증 인가로직으로 유저 권한 확인
+    @Override
+    public void patch(User user) {
+        User entity = getOrThrowIfNotExists(user);
+        userMapper.updateEntityFromSource(entity, user);
+        userRepository.save(entity);
+    }
+
     private void validateUser(Business business, User user) {
         throwIfAlreadyExists(business, user);
-        checkBusinessRepresentative(business, user);
+        throwIfBusinessAlreadyHasRepresentative(business, user);
     }
 
     public Optional<User> getOptional(String username, String password) {
@@ -53,10 +63,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_FOUND));
     }
 
-    private void checkBusinessRepresentative(Business business, User user) {
-        if (business.hasRepresentativeUser() && user.isRepresentative()) {
-            throw new BusinessRuntimeException(RuntimeErrorCode.BUSINESS_ALREADY_HAS_REPRESENTATIVE_USER);
-        }
+    private void throwIfBusinessAlreadyHasRepresentative(Business business, User user) {
+        if (business.hasRepresentativeUser() && user.isRepresentative()) throw new BusinessRuntimeException(RuntimeErrorCode.BUSINESS_ALREADY_HAS_REPRESENTATIVE_USER);
+    }
+
+    private void throwIfNotRepresentative(User user) {
+        if (!user.isRepresentative()) throw new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_REPRESENTATIVE);
     }
 
 }

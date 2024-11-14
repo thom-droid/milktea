@@ -8,6 +8,7 @@ import com.millktea.core.domain.business.entity.Business;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,16 +23,18 @@ public class BusinessController {
     private final BusinessService businessService;
     private final BusinessMapper businessMapper;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public SaveBusinessRes save(@RequestPart @Valid SaveBusinessReq req,
-                                @RequestBody MultipartFile logo) {
+                                @RequestPart MultipartFile logo) {
         Business business = businessMapper.toEntityFrom(req);
         return businessMapper.toResponseFrom(businessService.save(business, logo));
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping
     public SaveBusinessRes update(@RequestPart @Valid SaveBusinessReq req,
-                                  @RequestBody MultipartFile logo) {
+                                  @RequestPart MultipartFile logo) {
         Business business = businessMapper.toEntityFrom(req);
         return businessMapper.toResponseFrom(businessService.update(business, logo));
     }
