@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
-public class SaveUserRes {
+public class CommonUserRes {
     private final String username;
     private final String name;
     private final String email;

@@ -4,7 +4,7 @@ import com.milktea.stub.user.UserReqStub;
 import com.milktea.stub.user.UserStub;
 import com.millktea.api.config.domain.business.UserTestConfig;
 import com.millktea.api.domain.user.dto.SaveUserReq;
-import com.millktea.api.domain.user.dto.SaveUserRes;
+import com.millktea.api.domain.user.dto.CommonUserRes;
 import com.millktea.core.domain.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,16 +42,16 @@ class UserMapperTest {
         User userStub = UserStub.createUserStub();
 
         // when
-        SaveUserRes saveUserRes = userMapper.toDtoFrom(userStub);
+        CommonUserRes commonUserRes = userMapper.toDtoFrom(userStub);
 
         // then
-        assertEquals(saveUserRes.getUsername(), userStub.getUsername());
-        assertEquals(saveUserRes.getName(), userStub.getName());
-        assertEquals(saveUserRes.getEmail(), userStub.getEmail());
-        assertEquals(saveUserRes.getPhone(), userStub.getPhone());
-        assertEquals(saveUserRes.getRole(), userStub.getRole());
-        assertEquals(saveUserRes.getPrivileges(), userStub.getPrivileges());
-        assertEquals(saveUserRes.getStatus(), userStub.getStatus());
+        assertEquals(commonUserRes.getUsername(), userStub.getUsername());
+        assertEquals(commonUserRes.getName(), userStub.getName());
+        assertEquals(commonUserRes.getEmail(), userStub.getEmail());
+        assertEquals(commonUserRes.getPhone(), userStub.getPhone());
+        assertEquals(commonUserRes.getRole(), userStub.getRole());
+        assertEquals(commonUserRes.getPrivileges(), userStub.getPrivileges());
+        assertEquals(commonUserRes.getStatus(), userStub.getStatus());
     }
 
     @Test

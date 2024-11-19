@@ -1,7 +1,7 @@
 package com.millktea.api.domain.user.controller;
 
+import com.millktea.api.domain.user.dto.CommonUserRes;
 import com.millktea.api.domain.user.dto.SaveUserReq;
-import com.millktea.api.domain.user.dto.SaveUserRes;
 import com.millktea.api.domain.user.mapper.UserMapper;
 import com.millktea.api.domain.user.service.UserService;
 import com.millktea.core.domain.user.entity.User;
@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+//TODO:: 인증 토큰으로 로그인 정보 받아올 필요 있음
 
 @Validated
 @Slf4j
@@ -24,10 +26,17 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public SaveUserRes save(@RequestBody @Valid SaveUserReq req) {
+    public CommonUserRes save(@RequestBody @Valid SaveUserReq req) {
         User entityFrom = userMapper.toEntityFrom(req);
         User saved = userService.save(req.getBusinessNo(), entityFrom);
         return userMapper.toDtoFrom(saved);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping
+    public void patch(@RequestBody @Valid SaveUserReq req) {
+        User entityFrom = userMapper.toEntityFrom(req);
+        userService.patch(entityFrom);
     }
 
 }

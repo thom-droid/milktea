@@ -1,8 +1,11 @@
 package com.millktea.api.domain.business.service.impl;
 
 import com.millktea.api.domain.business.mapper.BusinessMapper;
+import com.millktea.api.domain.business.service.BusinessAccessData;
 import com.millktea.api.domain.business.service.BusinessService;
 import com.millktea.api.domain.file.FileStorageService;
+import com.millktea.api.domain.user.service.UserService;
+import com.millktea.core.domain.user.entity.User;
 import com.millktea.core.exception.BusinessRuntimeException;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.repository.BusinessRepository;
@@ -21,7 +24,7 @@ import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
 @Service
 public class BusinessServiceImpl implements BusinessService {
 
-    private final BusinessRepository businessRepository;
+    private final BusinessAccessData businessAccessData;
     private final FileStorageService fileStorageService;
     private final BusinessMapper businessMapper;
 
@@ -29,7 +32,7 @@ public class BusinessServiceImpl implements BusinessService {
     public Business save(Business business, MultipartFile image) {
         throwIfAlreadyExist(business.getBusinessNo());
         processImageIfExist(business, image);
-        return businessRepository.save(business);
+        return businessAccessData.save(business);
     }
 
     @Override
@@ -48,7 +51,7 @@ public class BusinessServiceImpl implements BusinessService {
 
     @Override
     public Business getOne(String businessNo) {
-        return getOptional(businessNo).orElseThrow(() -> new BusinessRuntimeException(BUSINESS_NOT_FOUND));
+        return businessAccessData.get(businessNo);
     }
 
     @Override
@@ -56,7 +59,7 @@ public class BusinessServiceImpl implements BusinessService {
         getOptional(business.getBusinessNo()).ifPresentOrElse(
                 entity -> {
                     entity.deactivate();
-                    businessRepository.save(entity);
+                    businessAccessData.save(entity);
                 },
                 () -> {
                     throw new BusinessRuntimeException(BUSINESS_NOT_FOUND);
@@ -64,13 +67,19 @@ public class BusinessServiceImpl implements BusinessService {
         );
     }
 
-    private void updateBusiness(Business business, MultipartFile image) {
-        processImageIfExist(business, image);
-        businessRepository.save(business);
+    @Override
+    public boolean containsUser(String businessNo, User user) {
+
+        return false;
     }
 
-    public Optional<Business> getOptional(String businessNo) {
-        return businessRepository.findByBusinessNo(businessNo);
+    private void updateBusiness(Business business, MultipartFile image) {
+        processImageIfExist(business, image);
+        businessAccessData.save(business);
+    }
+
+    private Optional<Business> getOptional(String businessNo) {
+        return businessAccessData.getOptional(businessNo);
     }
 
     private void processImageIfExist(Business business, MultipartFile img) {

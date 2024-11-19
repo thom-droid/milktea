@@ -6,5 +6,6 @@ public interface UserService {
 
     User save(String businessNo, User user);
     void patch(User user);
+    User updatePrivileges(String businessNo, User user);
 
 }

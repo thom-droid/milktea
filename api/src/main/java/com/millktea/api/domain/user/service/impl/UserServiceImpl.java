@@ -5,7 +5,6 @@ import com.millktea.api.domain.user.mapper.UserMapper;
 import com.millktea.api.domain.user.service.UserService;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.user.entity.User;
-import com.millktea.core.domain.user.repository.UserRepository;
 import com.millktea.core.exception.BusinessRuntimeException;
 import com.millktea.core.exception.RuntimeErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserAccessDataImpl userAccessData;
     private final BusinessService businessService;
     private final UserMapper userMapper;
 
@@ -30,15 +29,32 @@ public class UserServiceImpl implements UserService {
         validateUser(business, user);
         user.setDefaultRoleDependingOnRole();
         user.addBusiness(business);
-        return userRepository.save(user);
+        return userAccessData.save(user);
     }
 
     // TODO 인증 인가로직으로 유저 권한 확인
     @Override
     public void patch(User user) {
-        User entity = getOrThrowIfNotExists(user);
+        User entity = getByUsernameAndPasswordOrThrowIfNotExists(user);
         userMapper.updateEntityFromSource(entity, user);
-        userRepository.save(entity);
+        userAccessData.save(entity);
+    }
+
+    /**
+     * 유저 권한을 수정한다.
+     * 수정이 가능한 것은 대표계정 (REPRESENTATIVE) 만 가능하다.
+     * @param businessNo
+     * @param target
+     * @return
+     */
+    @Override
+    public User updatePrivileges(String businessNo, User target) {
+        Business business = businessService.getOne(businessNo);
+        User entity = getByUsernameAndPasswordOrThrowIfNotExists(target);
+        entity.updatePrivileges(target.getPrivileges());
+        // TODO:: JWT 재발급 필요
+        userAccessData.save(entity);
+        return entity;
     }
 
     private void validateUser(Business business, User user) {
@@ -47,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Optional<User> getOptional(String username, String password) {
-        return userRepository.findByUsernameAndPassword(username, password);
+        return userAccessData.getOptional(username, password);
     }
 
     private void throwIfAlreadyExists(Business business, User user) {
@@ -58,9 +74,8 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    private User getOrThrowIfNotExists(User user) {
-        return getOptional(user.getUsername(), user.getPassword())
-                .orElseThrow(() -> new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_FOUND));
+    private User getByUsernameAndPasswordOrThrowIfNotExists(User user) {
+        return userAccessData.get(user.getUsername(), user.getPassword());
     }
 
     private void throwIfBusinessAlreadyHasRepresentative(Business business, User user) {

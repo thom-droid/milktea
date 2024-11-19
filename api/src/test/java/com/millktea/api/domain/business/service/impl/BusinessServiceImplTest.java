@@ -6,8 +6,10 @@ import com.milktea.stub.user.UserStub;
 import com.millktea.api.config.domain.business.BusinessTestConfig;
 import com.millktea.api.domain.business.dto.SaveBusinessReq;
 import com.millktea.api.domain.business.mapper.BusinessMapper;
+import com.millktea.api.domain.business.service.BusinessAccessData;
 import com.millktea.api.domain.business.service.BusinessService;
 import com.millktea.api.domain.file.FileStorageService;
+import com.millktea.api.domain.file.impl.DefaultStorageServiceImpl;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.business.entity.Status;
 import com.millktea.core.domain.business.repository.BusinessRepository;
@@ -35,13 +37,13 @@ import static org.mockito.Mockito.when;
 class BusinessServiceImplTest {
 
     @MockBean
-    BusinessRepository businessRepository;
+    DefaultStorageServiceImpl fileStorageService;
 
     @MockBean
-    FileStorageService fileStorageService;
+    BusinessAccessDataImpl businessAccessData;
 
     @Autowired
-    BusinessService businessService;
+    BusinessServiceImpl businessService;
 
     @Autowired
     BusinessMapper businessMapper;
@@ -61,8 +63,8 @@ class BusinessServiceImplTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
         //when
-        when(businessRepository.findByBusinessNo(business.getBusinessNo())).thenReturn(Optional.empty());
-        when(businessRepository.save(business)).thenReturn(business);
+        when(businessAccessData.getOptional(business.getBusinessNo())).thenReturn(Optional.empty());
+        when(businessAccessData.save(business)).thenReturn(business);
         when(fileStorageService.storeFile(mockMultipartFile)).thenReturn("test.jpg");
 
         //then
@@ -87,7 +89,7 @@ class BusinessServiceImplTest {
 
         //when
         //assuming that the business already exists by returning the same business object
-        when(businessRepository.findByBusinessNo(business.getBusinessNo())).thenReturn(Optional.of(business));
+        when(businessAccessData.getOptional(business.getBusinessNo())).thenReturn(Optional.of(business));
 
         //then
         BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> businessService.save(business, mockMultipartFile));
@@ -99,7 +101,7 @@ class BusinessServiceImplTest {
     void givenNewBusinessNotExistsThenThrows() {
         //given
         Business businessStub = BusinessStub.createBusinessStub();
-        when(businessRepository.findByBusinessNo(businessStub.getBusinessNo())).thenReturn(Optional.empty());
+        when(businessAccessData.getOptional(businessStub.getBusinessNo())).thenReturn(Optional.empty());
         MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
         //then
@@ -125,8 +127,8 @@ class BusinessServiceImplTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test".getBytes());
 
         //when
-        when(businessRepository.findByBusinessNo(source.getBusinessNo())).thenReturn(Optional.of(entity));
-        when(businessRepository.save(Mockito.mock(Business.class))).thenReturn(entity);
+        when(businessAccessData.getOptional(source.getBusinessNo())).thenReturn(Optional.of(entity));
+        when(businessAccessData.save(Mockito.mock(Business.class))).thenReturn(entity);
         assertDoesNotThrow(() -> businessService.update(source, mockMultipartFile));
 
         //then
@@ -142,8 +144,8 @@ class BusinessServiceImplTest {
         Business business = BusinessStub.createBusinessWithUsersStub(List.of(representative, user));
 
         //when
-        when(businessRepository.findByBusinessNo(business.getBusinessNo())).thenReturn(Optional.of(business));
-        when(businessRepository.save(Mockito.mock(Business.class))).thenReturn(Mockito.any(Business.class));
+        when(businessAccessData.getOptional(business.getBusinessNo())).thenReturn(Optional.of(business));
+        when(businessAccessData.save(Mockito.mock(Business.class))).thenReturn(Mockito.any(Business.class));
 
         //then
         assertDoesNotThrow(() -> businessService.deactivate(business));

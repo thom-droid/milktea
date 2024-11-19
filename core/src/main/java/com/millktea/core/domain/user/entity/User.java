@@ -85,4 +85,8 @@ public class User extends Auditing {
     public void setDefaultRoleDependingOnRole() {
         privileges = role == Role.REPRESENTATIVE ? List.of(Privilege.ALL) : List.of(Privilege.READ);
     }
+
+    public void updatePrivileges(List<Privilege> privileges) {
+        this.privileges = privileges;
+    }
 }

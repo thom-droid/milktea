@@ -2,7 +2,7 @@ package com.millktea.api.domain.user.mapper;
 
 import com.millktea.api.domain.user.dto.PatchUserReq;
 import com.millktea.api.domain.user.dto.SaveUserReq;
-import com.millktea.api.domain.user.dto.SaveUserRes;
+import com.millktea.api.domain.user.dto.CommonUserRes;
 import com.millktea.core.domain.user.entity.User;
 import org.mapstruct.*;
 
@@ -11,7 +11,7 @@ public interface UserMapper {
 
     User toEntityFrom(SaveUserReq saveUserReq);
     User toEntityFrom(PatchUserReq patchUserReq);
-    SaveUserRes toDtoFrom(User user);
+    CommonUserRes toDtoFrom(User user);
 
     @BeanMapping(
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
