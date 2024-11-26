@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // 사용자 정보, 아이디, 비밀번호, 이름(담당자), 이메일, 회사정보, 권한
 @Getter
@@ -20,7 +21,6 @@ import java.util.List;
 @Entity
 public class User extends Auditing {
 
-    @EqualsAndHashCode.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -58,18 +58,18 @@ public class User extends Auditing {
     private Business business;
 
     public enum Role {
-        REPRESENTATIVE, USER
+        REPRESENTATIVE, USER;
+
     }
 
     public enum Privilege {
-        WRITE, READ, MODIFY, DELETE, ALL
-    }
+        WRITE, READ, MODIFY, DELETE, ALL;
 
+    }
     public void addBusiness(Business business) {
         this.business = business;
         business.addUser(this);
     }
-
     public boolean isRepresentative() {
         return role == Role.REPRESENTATIVE;
     }
@@ -88,5 +88,22 @@ public class User extends Auditing {
 
     public void updatePrivileges(List<Privilege> privileges) {
         this.privileges = privileges;
+    }
+
+    public boolean doesNotHaveAnyPrivilege() {
+        return privileges.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(username, user.username) && Objects.equals(business, user.business);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, business);
     }
 }

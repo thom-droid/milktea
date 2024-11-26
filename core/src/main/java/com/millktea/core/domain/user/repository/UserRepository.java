@@ -12,4 +12,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsernameAndPassword(String username, String password);
 
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.username = :username AND u.business.businessNo = :businessNo")
+    boolean existsByUsernameAndBusinessNo(String username, String businessNo);
+
+    @Query("SELECT u FROM User u where u.username = :username AND u.business.businessNo = :businessNo")
+    Optional<User> findByUsernameAndBusinessNo(String username, String businessNo);
+
 }

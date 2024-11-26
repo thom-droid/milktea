@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.millktea.core.exception.RuntimeErrorCode.USER_NOT_FOUND;
+
 @RequiredArgsConstructor
 @Service
 public class UserAccessDataImpl implements UserAccessData {
@@ -19,7 +21,7 @@ public class UserAccessDataImpl implements UserAccessData {
     @Override
     public User get(String username, String password) {
         return getOptional(username, password)
-                .orElseThrow(() -> new BusinessRuntimeException(RuntimeErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessRuntimeException(USER_NOT_FOUND));
     }
 
     @Override
@@ -32,4 +34,19 @@ public class UserAccessDataImpl implements UserAccessData {
         return userRepository.findByUsernameAndPassword(username, password);
     }
 
+    @Override
+    public boolean existsByUsernameAndBusinessNo(String username, String businessNo) {
+        return userRepository.existsByUsernameAndBusinessNo(username, businessNo);
+    }
+
+    @Override
+    public Optional<User> getOptionalByUsernameAndBusinessNo(String username, String businessNo) {
+        return userRepository.findByUsernameAndBusinessNo(username, businessNo);
+    }
+
+    @Override
+    public User getByUsernameAndBusinessNo(String username, String businessNo) {
+        return getOptionalByUsernameAndBusinessNo(username, businessNo)
+                .orElseThrow(() -> new BusinessRuntimeException(USER_NOT_FOUND));
+    }
 }

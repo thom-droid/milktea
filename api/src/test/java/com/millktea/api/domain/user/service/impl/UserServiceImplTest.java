@@ -5,12 +5,9 @@ import com.milktea.stub.user.UserReqStub;
 import com.milktea.stub.user.UserStub;
 import com.millktea.api.config.domain.business.BusinessTestConfig;
 import com.millktea.api.config.domain.business.UserTestConfig;
-import com.millktea.api.domain.business.service.BusinessService;
 import com.millktea.api.domain.business.service.impl.BusinessServiceImpl;
 import com.millktea.api.domain.user.dto.SaveUserReq;
 import com.millktea.api.domain.user.mapper.UserMapper;
-import com.millktea.api.domain.user.service.UserAccessData;
-import com.millktea.api.domain.user.service.UserService;
 import com.millktea.core.domain.business.entity.Business;
 import com.millktea.core.domain.user.entity.User;
 import com.millktea.core.domain.user.repository.UserRepository;
@@ -136,6 +133,62 @@ class UserServiceImplTest {
         assertDoesNotThrow(() -> userService.patch(source));
         Mockito.verify(userAccessData, Mockito.times(1)).get(source.getUsername(), source.getPassword());
         Mockito.verify(userAccessData, Mockito.times(1)).save(entity);
+    }
+
+    @Test
+    void givenNewPrivileges_whenUpdatePrivileges_thenSuccess() {
+        //given
+        User representative = UserStub.createUserStub(User.Role.REPRESENTATIVE);
+        User user1 = UserStub.createUserStub(User.Role.USER);
+        Business business = BusinessStub.createBusinessWithUsersStub(List.of(representative, user1));
+        User userWithNewPrivileges = UserStub.createUserStub(user1.getUsername(), User.Role.USER, List.of(User.Privilege.READ, User.Privilege.WRITE));
+
+        //when
+        Mockito.when(businessService.getOne(Mockito.anyString())).thenReturn(business);
+        Mockito.when(userAccessData.getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString())).thenReturn(user1);
+        Mockito.when(userAccessData.save(Mockito.any())).thenReturn(user1);
+
+        //then
+        User updatedWithPrivileges = assertDoesNotThrow(() -> userService.updatePrivileges(business.getBusinessNo(), userWithNewPrivileges));
+        Mockito.verify(businessService, Mockito.times(1)).getOne(Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).save(user1);
+
+        assertEquals(updatedWithPrivileges.getPrivileges(), List.of(User.Privilege.READ, User.Privilege.WRITE));
+    }
+
+    @Test
+    void whenTryingToUpdatePrivilegesOfRepresentative_thenThrows() {
+        //given
+        User representative = UserStub.createUserStub("representative", User.Role.REPRESENTATIVE);
+        User user1 = UserStub.createUserStub(User.Role.USER);
+        Business business = BusinessStub.createBusinessWithUsersStub(List.of(representative, user1));
+        User userWithNewPrivileges = UserStub.createUserStub(representative.getUsername(), User.Role.REPRESENTATIVE, List.of(User.Privilege.READ, User.Privilege.WRITE));
+
+        //when
+        Mockito.when(businessService.getOne(Mockito.anyString())).thenReturn(business);
+        Mockito.when(userAccessData.getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString())).thenReturn(representative);
+
+        //then
+        BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> userService.updatePrivileges(business.getBusinessNo(), userWithNewPrivileges));
+        assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE);
+        Mockito.verify(businessService, Mockito.times(1)).getOne(Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString());
+    }
+
+    @Test
+    void whenTryingToUpdateWithEmptyPrivileges_thenThrows() {
+        //given
+        User representative = UserStub.createUserStub("representative", User.Role.REPRESENTATIVE);
+        User user1 = UserStub.createUserStub(User.Role.USER);
+        Business business = BusinessStub.createBusinessWithUsersStub(List.of(representative, user1));
+        User userWithEmptyPrivileges = UserStub.createUserStub(user1.getUsername(), User.Role.USER, List.of());
+
+        //when
+
+        //then
+        BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> userService.updatePrivileges(business.getBusinessNo(), userWithEmptyPrivileges));
+        assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.NO_PRIVILEGES_SELECTED);
     }
 
 }

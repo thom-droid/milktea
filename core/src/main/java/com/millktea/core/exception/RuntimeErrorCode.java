@@ -12,11 +12,15 @@ public enum RuntimeErrorCode {
     BUSINESS_NOT_ACTIVE(1002, "Business not active"),
     BUSINESS_HAS_NO_REPRESENTATIVE_USER(1003, "Business has no representative user"),
     BUSINESS_ALREADY_HAS_REPRESENTATIVE_USER(1004, "Business already has representative user"),
+    BUSINESS_DOES_NOT_CONTAIN_USER(1005, "Business does not contain user"),
 
     USER_NOT_FOUND(2000, "User not found"),
     USER_ALREADY_EXISTS(2001, "User already exists"),
     USER_NOT_ACTIVE(2002, "User not active"),
     USER_NOT_REPRESENTATIVE(2003, "User is not representative"),
+    USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE(2004, "User representative must not be inactive"),
+
+    NO_PRIVILEGES_SELECTED(3000, "No privileges selected"),
 
     FILE_NOT_FOUND(9000, "File not found"),
     FILE_UPLOAD_FAILED(9001, "File upload failed"),

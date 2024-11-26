@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 //사업자번호, 대표자명, 주소, 전화번호, 이메일, 회사 로고
@@ -21,7 +22,6 @@ import java.util.Optional;
 @Entity
 public class Business extends Auditing {
 
-    @EqualsAndHashCode.Exclude
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -90,4 +90,16 @@ public class Business extends Auditing {
         return getRepresentativeUser().map(u -> u.equals(user)).orElse(false);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Business business = (Business) o;
+        return Objects.equals(businessNo, business.businessNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(businessNo);
+    }
 }

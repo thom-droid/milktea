@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.millktea.core.exception.RuntimeErrorCode.*;
+
 // TODO authorize, authenticate
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class UserServiceImpl implements UserService {
     // TODO 인증 인가로직으로 유저 권한 확인
     @Override
     public void patch(User user) {
-        User entity = getByUsernameAndPasswordOrThrowIfNotExists(user);
+        User entity = getByUsernameAndPasswordOrThrow(user);
         userMapper.updateEntityFromSource(entity, user);
         userAccessData.save(entity);
     }
@@ -49,8 +51,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updatePrivileges(String businessNo, User target) {
+        if (target.doesNotHaveAnyPrivilege()) throw new BusinessRuntimeException(NO_PRIVILEGES_SELECTED);
         Business business = businessService.getOne(businessNo);
-        User entity = getByUsernameAndPasswordOrThrowIfNotExists(target);
+        User entity = getByUsernameAndBusinessNo(target.getUsername(), businessNo);
+        if (!business.containsUser(entity)) throw new BusinessRuntimeException(BUSINESS_DOES_NOT_CONTAIN_USER);
+        if (entity.isRepresentative()) throw new BusinessRuntimeException(USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE);
         entity.updatePrivileges(target.getPrivileges());
         // TODO:: JWT 재발급 필요
         userAccessData.save(entity);
@@ -66,6 +71,10 @@ public class UserServiceImpl implements UserService {
         return userAccessData.getOptional(username, password);
     }
 
+    public User getByUsernameAndBusinessNo(String username, String businessNo) {
+        return userAccessData.getByUsernameAndBusinessNo(username, businessNo);
+    }
+
     private void throwIfAlreadyExists(Business business, User user) {
         getOptional(user.getUsername(), user.getPassword())
                 .ifPresent(u -> {
@@ -74,7 +83,7 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    private User getByUsernameAndPasswordOrThrowIfNotExists(User user) {
+    private User getByUsernameAndPasswordOrThrow(User user) {
         return userAccessData.get(user.getUsername(), user.getPassword());
     }
 

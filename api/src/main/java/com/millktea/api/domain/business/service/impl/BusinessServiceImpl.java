@@ -4,6 +4,7 @@ import com.millktea.api.domain.business.mapper.BusinessMapper;
 import com.millktea.api.domain.business.service.BusinessAccessData;
 import com.millktea.api.domain.business.service.BusinessService;
 import com.millktea.api.domain.file.FileStorageService;
+import com.millktea.api.domain.user.service.UserAccessData;
 import com.millktea.api.domain.user.service.UserService;
 import com.millktea.core.domain.user.entity.User;
 import com.millktea.core.exception.BusinessRuntimeException;
@@ -25,6 +26,7 @@ import static com.millktea.core.exception.RuntimeErrorCode.BUSINESS_NOT_FOUND;
 public class BusinessServiceImpl implements BusinessService {
 
     private final BusinessAccessData businessAccessData;
+    private final UserAccessData userAccessData;
     private final FileStorageService fileStorageService;
     private final BusinessMapper businessMapper;
 
@@ -69,8 +71,9 @@ public class BusinessServiceImpl implements BusinessService {
 
     @Override
     public boolean containsUser(String businessNo, User user) {
-
-        return false;
+        return getOptional(businessNo)
+                .map(business -> userAccessData.existsByUsernameAndBusinessNo(user.getUsername(), businessNo))
+                .orElse(false);
     }
 
     private void updateBusiness(Business business, MultipartFile image) {
