@@ -21,4 +21,5 @@ public abstract class Auditing {
 
     @LastModifiedDate
     private LocalDateTime modifiedAt;
+
 }

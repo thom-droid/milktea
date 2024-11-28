@@ -1,0 +1,12 @@
+tasks.test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':api')
+}
+
+bootJar {
+    enabled = false;
+}
