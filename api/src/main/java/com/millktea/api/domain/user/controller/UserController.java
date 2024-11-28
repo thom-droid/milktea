@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,6 +55,13 @@ public class UserController {
         User entity = userMapper.toEntityFrom(req);
         User updated = userService.updateStatus(req.getBusinessNo(), entity);
         return userMapper.toDtoFrom(updated);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam String businessNo, @RequestParam String username) {
+        userService.delete(businessNo, username);
+        return ResponseEntity.noContent().build();
     }
 
 }

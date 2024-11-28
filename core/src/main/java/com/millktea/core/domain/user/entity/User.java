@@ -13,7 +13,6 @@ import java.util.Objects;
 
 // 사용자 정보, 아이디, 비밀번호, 이름(담당자), 이메일, 회사정보, 권한
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -94,9 +93,7 @@ public class User extends Auditing {
         return privileges.isEmpty();
     }
 
-    public void updateStatus(Status status) {
-        this.status = status;
-    }
+    public void updateStatus(Status status) {this.status = status;}
 
     @Override
     public boolean equals(Object o) {

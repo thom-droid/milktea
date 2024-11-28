@@ -9,8 +9,7 @@ public interface UserAccessData {
     User save(User data);
     Optional<User> getOptional(String username, String password);
     boolean existsByUsernameAndBusinessNo(String username, String businessNo);
-
     Optional<User> getOptionalByUsernameAndBusinessNo(String username, String businessNo);
-
     User getByUsernameAndBusinessNo(String username, String businessNo);
+    void delete(User entity);
 }

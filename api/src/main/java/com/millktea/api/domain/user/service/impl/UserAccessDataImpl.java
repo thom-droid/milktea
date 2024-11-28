@@ -49,4 +49,9 @@ public class UserAccessDataImpl implements UserAccessData {
         return getOptionalByUsernameAndBusinessNo(username, businessNo)
                 .orElseThrow(() -> new BusinessRuntimeException(USER_NOT_FOUND));
     }
+
+    @Override
+    public void delete(User entity) {
+        userRepository.delete(entity);
+    }
 }

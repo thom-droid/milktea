@@ -16,7 +16,7 @@ import java.util.Optional;
 import static com.millktea.core.exception.RuntimeErrorCode.*;
 
 // TODO authorize, authenticate
-// TODO:: 유저 이름, 회사 번호로 조회하는 빈 추가
+// TODO:: 유저 이름, 회사 번호로 조회하는 빈 추가 쿼리로 조회
 // TODO:: 특정 메서드 수행 시 마스터 계정 확인 로직 추가 (마스터 계정이 아닌 경우 예외 발생)
 
 @Slf4j
@@ -85,6 +85,17 @@ public class UserServiceImpl implements UserService {
         user.updateStatus(user.getStatus());
 
         return userAccessData.save(user);
+    }
+
+    @Override
+    public void delete(String businessNo, String username) {
+        Business business = businessService.getOne(businessNo);
+        User entity = getByUsernameAndBusinessNo(username, businessNo);
+
+        throwIfBusinessNotContainUser(business, entity);
+        throwIfTryingToUpdateRepresentative(entity);
+
+        userAccessData.delete(entity);
     }
 
     private void throwIfBusinessNotContainUser(Business business, User user) {
