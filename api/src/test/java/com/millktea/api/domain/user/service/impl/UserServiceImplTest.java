@@ -9,6 +9,7 @@ import com.millktea.api.domain.business.service.impl.BusinessServiceImpl;
 import com.millktea.api.domain.user.dto.SaveUserReq;
 import com.millktea.api.domain.user.mapper.UserMapper;
 import com.millktea.core.domain.business.entity.Business;
+import com.millktea.core.domain.business.entity.Status;
 import com.millktea.core.domain.user.entity.User;
 import com.millktea.core.domain.user.repository.UserRepository;
 import com.millktea.core.exception.BusinessRuntimeException;
@@ -171,7 +172,7 @@ class UserServiceImplTest {
 
         //then
         BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> userService.updatePrivileges(business.getBusinessNo(), userWithNewPrivileges));
-        assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE);
+        assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.USER_REPRESENTATIVE_MUST_NOT_BE_UPDATED);
         Mockito.verify(businessService, Mockito.times(1)).getOne(Mockito.anyString());
         Mockito.verify(userAccessData, Mockito.times(1)).getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString());
     }
@@ -189,6 +190,66 @@ class UserServiceImplTest {
         //then
         BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> userService.updatePrivileges(business.getBusinessNo(), userWithEmptyPrivileges));
         assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.NO_PRIVILEGES_SELECTED);
+    }
+
+    @Test
+    void whenUpdateStatus_thenSuccess() {
+        //given
+        User user = UserStub.createUserStub(User.Role.USER);
+        user.updateStatus(Status.INACTIVE);
+        Business business = BusinessStub.createBusinessWithUsersStub(List.of(user));
+        Status status = Status.INACTIVE;
+
+        //when
+        Mockito.when(businessService.getOne(Mockito.anyString())).thenReturn(business);
+        Mockito.when(userAccessData.getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
+        Mockito.when(userAccessData.save(Mockito.any())).thenReturn(user);
+
+        //then
+        User updatedUser = assertDoesNotThrow(() -> userService.updateStatus(business.getBusinessNo(), user));
+        Mockito.verify(businessService, Mockito.times(1)).getOne(Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).save(user);
+
+        assertEquals(updatedUser.getStatus(), status);
+    }
+
+    @Test
+    void givenUserReq_whenUserIsNotContained_thenThrows() {
+
+        //given
+        User userNotIncluded = UserStub.createUserStub(User.Role.USER);
+        userNotIncluded.updateStatus(Status.INACTIVE);
+        Business business = BusinessStub.createBusinessStub();
+
+        //when
+        Mockito.when(businessService.getOne(Mockito.anyString())).thenReturn(business);
+        Mockito.when(userAccessData.getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString())).thenReturn(userNotIncluded);
+
+        // then
+        BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> userService.updateStatus(business.getBusinessNo(), userNotIncluded));
+        Mockito.verify(businessService, Mockito.times(1)).getOne(Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString());
+
+        assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.BUSINESS_DOES_NOT_CONTAIN_USER);
+    }
+
+    @Test
+    void givenRepresentative_whenTryingToUpdateStatus_thenThrows() {
+        //given
+        User representative = UserStub.createUserStub(User.Role.REPRESENTATIVE);
+        Business business = BusinessStub.createBusinessWithUsersStub(List.of(representative));
+        representative.updateStatus(Status.INACTIVE);
+
+        //when
+        Mockito.when(businessService.getOne(Mockito.anyString())).thenReturn(business);
+        Mockito.when(userAccessData.getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString())).thenReturn(representative);
+
+        //then
+        BusinessRuntimeException businessRuntimeException = assertThrows(BusinessRuntimeException.class, () -> userService.updateStatus(business.getBusinessNo(), representative));
+        assertEquals(businessRuntimeException.getErrorCode(), RuntimeErrorCode.USER_REPRESENTATIVE_MUST_NOT_BE_UPDATED);
+        Mockito.verify(businessService, Mockito.times(1)).getOne(Mockito.anyString());
+        Mockito.verify(userAccessData, Mockito.times(1)).getByUsernameAndBusinessNo(Mockito.anyString(), Mockito.anyString());
     }
 
 }

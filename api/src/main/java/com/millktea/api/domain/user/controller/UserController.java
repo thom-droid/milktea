@@ -48,4 +48,12 @@ public class UserController {
         return userMapper.toDtoFrom(updated);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/status")
+    public CommonUserRes updateStatus(@RequestBody @Valid PatchUserReq.Status req) {
+        User entity = userMapper.toEntityFrom(req);
+        User updated = userService.updateStatus(req.getBusinessNo(), entity);
+        return userMapper.toDtoFrom(updated);
+    }
+
 }

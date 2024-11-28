@@ -18,7 +18,8 @@ public enum RuntimeErrorCode {
     USER_ALREADY_EXISTS(2001, "User already exists"),
     USER_NOT_ACTIVE(2002, "User not active"),
     USER_NOT_REPRESENTATIVE(2003, "User is not representative"),
-    USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE(2004, "User representative must not be inactive"),
+    USER_HAS_NO_PRIVILEGES(2005, "User has no privileges"),
+    USER_REPRESENTATIVE_MUST_NOT_BE_UPDATED(2006, "User representative must not be updated"),
 
     NO_PRIVILEGES_SELECTED(3000, "No privileges selected"),
 

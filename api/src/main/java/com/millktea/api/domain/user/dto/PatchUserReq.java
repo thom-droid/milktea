@@ -29,4 +29,17 @@ public class PatchUserReq {
         @Builder.Default
         private List<User.Privilege> privileges = new ArrayList<>();
     }
+
+    @AllArgsConstructor
+    @Getter
+    @Builder
+    public static class Status {
+        @NotNull
+        private String businessNo;
+        @NotNull
+        private String username;
+        @NotNull
+        private com.millktea.core.domain.business.entity.Status status;
+    }
+
 }

@@ -16,6 +16,9 @@ import java.util.Optional;
 import static com.millktea.core.exception.RuntimeErrorCode.*;
 
 // TODO authorize, authenticate
+// TODO:: 유저 이름, 회사 번호로 조회하는 빈 추가
+// TODO:: 특정 메서드 수행 시 마스터 계정 확인 로직 추가 (마스터 계정이 아닌 경우 예외 발생)
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -34,7 +37,6 @@ public class UserServiceImpl implements UserService {
         return userAccessData.save(user);
     }
 
-    // TODO 인증 인가로직으로 유저 권한 확인
     @Override
     public void patch(User user) {
         User entity = getByUsernameAndPasswordOrThrow(user);
@@ -57,19 +59,40 @@ public class UserServiceImpl implements UserService {
         User entity = getByUsernameAndBusinessNo(target.getUsername(), businessNo);
 
         throwIfBusinessNotContainUser(business, entity);
-        throwIfTryingToUpdatePrivilegesOfRepresentative(entity);
+        throwIfTryingToUpdateRepresentative(entity);
 
         entity.updatePrivileges(target.getPrivileges());
         userAccessData.save(entity);
         return entity;
     }
 
+    /**
+     * 유저 상태를 수정한다.
+     * 수정이 가능한 것은 대표계정 (REPRESENTATIVE) 만 가능하다.
+     *
+     * @param businessNo
+     * @param user
+     * @return
+     */
+    @Override
+    public User updateStatus(String businessNo, User user) {
+        Business business = businessService.getOne(businessNo);
+        User entity = getByUsernameAndBusinessNo(user.getUsername(), businessNo);
+
+        throwIfBusinessNotContainUser(business, entity);
+        throwIfTryingToUpdateRepresentative(entity);
+
+        user.updateStatus(user.getStatus());
+
+        return userAccessData.save(user);
+    }
+
     private void throwIfBusinessNotContainUser(Business business, User user) {
         if (!business.containsUser(user)) throw new BusinessRuntimeException(BUSINESS_DOES_NOT_CONTAIN_USER);
     }
 
-    private void throwIfTryingToUpdatePrivilegesOfRepresentative(User user) {
-        if (user.isRepresentative()) throw new BusinessRuntimeException(USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE);
+    private void throwIfTryingToUpdateRepresentative(User user) {
+        if (user.isRepresentative()) throw new BusinessRuntimeException(USER_REPRESENTATIVE_MUST_NOT_BE_UPDATED);
     }
 
     private void validateUser(Business business, User user) {
