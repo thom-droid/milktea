@@ -52,14 +52,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updatePrivileges(String businessNo, User target) {
         if (target.doesNotHaveAnyPrivilege()) throw new BusinessRuntimeException(NO_PRIVILEGES_SELECTED);
+
         Business business = businessService.getOne(businessNo);
         User entity = getByUsernameAndBusinessNo(target.getUsername(), businessNo);
-        if (!business.containsUser(entity)) throw new BusinessRuntimeException(BUSINESS_DOES_NOT_CONTAIN_USER);
-        if (entity.isRepresentative()) throw new BusinessRuntimeException(USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE);
+
+        throwIfBusinessNotContainUser(business, entity);
+        throwIfTryingToUpdatePrivilegesOfRepresentative(entity);
+
         entity.updatePrivileges(target.getPrivileges());
-        // TODO:: JWT 재발급 필요
         userAccessData.save(entity);
         return entity;
+    }
+
+    private void throwIfBusinessNotContainUser(Business business, User user) {
+        if (!business.containsUser(user)) throw new BusinessRuntimeException(BUSINESS_DOES_NOT_CONTAIN_USER);
+    }
+
+    private void throwIfTryingToUpdatePrivilegesOfRepresentative(User user) {
+        if (user.isRepresentative()) throw new BusinessRuntimeException(USER_REPRESENTATIVE_MUST_NOT_BE_INACTICE);
     }
 
     private void validateUser(Business business, User user) {

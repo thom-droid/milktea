@@ -1,6 +1,7 @@
 package com.millktea.api.domain.user.controller;
 
 import com.millktea.api.domain.user.dto.CommonUserRes;
+import com.millktea.api.domain.user.dto.PatchUserReq;
 import com.millktea.api.domain.user.dto.SaveUserReq;
 import com.millktea.api.domain.user.mapper.UserMapper;
 import com.millktea.api.domain.user.service.UserService;
@@ -37,6 +38,14 @@ public class UserController {
     public void patch(@RequestBody @Valid SaveUserReq req) {
         User entityFrom = userMapper.toEntityFrom(req);
         userService.patch(entityFrom);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/privileges")
+    public CommonUserRes updatePrivileges(@RequestBody @Valid PatchUserReq.Privileges req) {
+        User entity = userMapper.toEntityFrom(req);
+        User updated = userService.updatePrivileges(req.getBusinessNo(), entity);
+        return userMapper.toDtoFrom(updated);
     }
 
 }

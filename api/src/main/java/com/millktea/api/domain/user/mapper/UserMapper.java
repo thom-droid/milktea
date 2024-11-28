@@ -11,6 +11,7 @@ public interface UserMapper {
 
     User toEntityFrom(SaveUserReq saveUserReq);
     User toEntityFrom(PatchUserReq patchUserReq);
+    User toEntityFrom(PatchUserReq.Privileges privileges);
     CommonUserRes toDtoFrom(User user);
 
     @BeanMapping(
