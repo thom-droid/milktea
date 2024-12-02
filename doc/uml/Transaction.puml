@@ -1,0 +1,295 @@
+@startuml
+
+interface TransactionService {
+    + Transaction getTransaction()
+    + List<Transaction> getTransactionList()
+    + Transaction save(Transaction data)
+    + Transaction save(List<Transaction> dataList)
+    + Transaction update(Transaction data)
+    + Transaction update(List<Transaction> dataList)
+    + Transaction updatePartnerAndTaxType(Transaction data)
+    + Transaction updatePartnerAndTaxType(List<Transaction> data)
+    + void delete(Transaction data)
+}
+
+interface TransactionValidator {
+    + void validate(Transaction data);
+}
+
+interface VoucherIssueService {
+    + TransactionVoucher issue(Transaction data)
+    + TransactionVoucher issue(List<Transaction> dataList);
+    + TransactionVoucher cancel()
+}
+
+interface TransactionIssueStatusService {
+    + void close(List<Transaction> dataList));
+    + void exclude(List<Transaction> dataList));
+    + void recoverToIssuable(List<Transaction> dataList));
+    + void checkIssueStatus(Transaction data));
+}
+
+interface AmountCalculator {
+    + void calculateAmount(Transaction data)
+}
+
+class AmountCalculatorImpl implements AmountCalculator {
+    - TransactionAmountCalculator transactionAmountCalculator
+    + void calculateAmount(Transaction data)
+}
+
+interface TransactionAmountCalculator extends AmountCalculator {
+    + void calculateAmount(Transaction data)
+}
+
+interface TaxInvoiceService extends TransactionService, TransactionValidator, VoucherIssueService, TransactionIssueStatusService {}
+interface CreditCardService extends TransactionService, TransactionValidator, VoucherIssueService, TransactionIssueStatusService{}
+interface CashReceiptService extends TransactionService,  TransactionValidator, VoucherIssueService, TransactionIssueStatusService {}
+interface DepositWithdrawalService extends TransactionService,  TransactionValidator, VoucherIssueService, TransactionIssueStatusService {}
+
+class TaxInvoiceServiceImpl extends AbstractTransactionServiceImpl {}
+class CreditCardServiceImpl extends AbstractTransactionServiceImpl {}
+class CashReceiptServiceImpl extends AbstractTransactionServiceImpl {}
+class DepositWithdrawalServiceImpl extends AbstractTransactionServiceImpl {}
+
+
+annotation MappedSuperClass as "MappedSuperClass" {
+    annotation with AbstractTransaction
+    annotation with AbstractTransactionItem
+}
+abstract class AbstractTransactionServiceImpl implements TransactionService, TransactionValidator, VoucherIssueService, TransactionIssueStatusService {
+    # TransactionValidatorFactory transactionValidatorFactory : strategy
+    # void validate(Transaction data);
+    # void calculateAmount(Transaction data);
+    # void issueVoucher(Transaction data);
+    # Transaction save(List<Transaction> dataList);
+}
+
+interface Journal {}
+interface Item {}
+
+interface Transaction<I extends Item, J extends Journal, V extends TransactionVoucher> {
+    + Long getId()
+    + String getTransactionNo()
+    + String getTransactionDate()
+    + String getIssueDate()
+    + TransactionAmount getAmount()
+    + PurchaseType getPurchaseType()
+    + TaxType getTaxType()
+    + IssueStatus getIssueStatus()
+    + List<I> getItemList()
+    + List<J> getJournalList()
+    + List<V> getVoucherList()
+    + String getRemark()
+    + Business getBusiness()
+
+    == issue status ==
+    + close()
+    + exclude()
+    + recoverToIssuable()
+}
+
+abstract class AbstractTransaction<I extends Item, J extends Journal, V extends TransactionVoucher> implements Transaction<I,J,V> {
+    # Long id
+    # String transactionNo
+    # String transactionDate : YYYYMMDD
+    # String issueDate : YYYYMMDD
+    # TransactionAmount amount
+    # PurchaseType purchaseType
+    # TaxType taxType
+    # IssueStatus issueStatus
+    # List<I> itemList
+    # List<J> journalList
+    # List<V> voucherList
+    # String remark
+    # Business business
+
+    == issue status overriding ==
+    + close()
+    + exclude()
+    + recoverToIssuable()
+}
+
+class TransactionAmount {
+    - long totalAmount
+    - long taxAmount
+    - long supplyAmount
+    - long transactionFeeAmount
+}
+
+class TaxInvoice extends AbstractTransaction<TaxInvoiceItem, TaxInvoiceJournal, TransactionVoucher> {
+    - Invoicer invoicer
+    - Invoicee invoicee
+}
+
+class CreditCard extends AbstractTransaction<CreditCardItem, CreditCardJournal, TransactionVoucher> {
+    - CardIssuer cardIssuer
+    - Partner merchant
+}
+
+class CashReceipt extends AbstractTransaction<CashReceiptItem, CashReceiptJournal, TransactionVoucher> {
+    - Partner partner
+}
+
+class DepositWithdrawal extends AbstractTransaction<DepositWithdrawalItem, DepositWithdrawalJournal, AlternativeVoucher>{
+    - Bank bank
+}
+
+interface TransactionItem<T extends Transaction> {
+    + Long getId()
+    + String getItemName()
+    + TransactionItemAmount getAmount()
+    + T getTransaction()
+    + int getOrder()
+}
+
+abstract class AbstractTransactionItem<T extends Transaction> implements TransactionItem<T> {
+    # Long id
+    # String itemName
+    # TransactionItemAmount amount
+    # T transaction
+    # int order
+}
+
+class TransactionItemAmount {
+    - long unitSupplyAmount
+    - long unitTaxAmount
+    - double quantity
+    - long totalSupplyAmount
+    - long totalTaxAmount
+    - long transactionFeeAmount
+    - long totalAmount
+}
+
+class TaxInvoiceItem extends AbstractTransactionItem<TaxInvoice> {
+}
+
+class CreditCardItem extends AbstractTransactionItem<CreditCard> {
+}
+
+class CashReceiptItem extends AbstractTransactionItem<CashReceipt> {
+}
+
+interface Journal {
+    + Long getId()
+    + String getJournalNo()
+    + AccountTitle getAccountTitle()
+    + long getAmount()
+    + int getOrder()
+}
+
+class TaxInvoiceJournal {
+    - Long id
+    - String journalNo
+    - AccountTitle accountTitle
+    - long amount
+    - TaxInvoice taxInvoice
+    - int order
+}
+
+class CreditCardJournal {
+    - Long id
+    - String journalNo
+    - AccountTitle accountTitle
+    - long amount
+    - CreditCard creditCard
+    - int order
+}
+
+class CashReceiptJournal {
+    - Long id
+    - String journalNo
+    - AccountTitle accountTitle
+    - long amount
+    - CashReceipt cashReceipt
+    - int order
+}
+
+class DepositWithdrawalJournal {
+    - Long id
+    - String journalNo
+    - AccountTitle accountTitle
+    - long amount
+    - DepositWithdrawal depositWithdrawal
+    - int order
+}
+
+interface Voucher {}
+
+class TransactionVoucher {
+    - Long id
+    - String voucherNo
+    - String transactionDate : YYYYMMDD
+    - String issueDate : YYYYMMDD
+    - long totalAmount
+    - long taxAmount
+    - long supplyAmount
+    - Partner partner
+    - TransactionType transactionType
+    - TaxType taxType
+    - IssueStatus issueStatus
+    - List<TransactionVoucherItem> voucherItemList
+    - List<TransactionVoucherJournal> voucherJournalList
+    - String remark
+    - Business business
+    - String transactionNo
+    - TransactionType transactionType
+}
+
+class TransactionVoucherItem {
+    - Long id
+    - String itemName
+    - long unitSupplyAmount
+    - long unitTaxAmount
+    - double quantity
+    - long totalSupplyAmount
+    - long totalTaxAmount
+    - long totalAmount
+    - TransactionVoucher voucher
+    - int order
+}
+
+class TransactionVoucherJournal {
+    - Long id
+    - String journalNo
+    - AccountTitle accountTitle
+    - long amount
+    - TransactionVoucher voucher
+    - int order
+}
+
+class AlternativeVoucher {}
+class AlternativeVoucherJournal {}
+
+class Business {}
+class Partner {}
+
+class CardIssuer {}
+class Bank {}
+class AccountTitle {}
+
+enum TransactionType {
+    TaxInvoice, CreditCard, CashReceipt, DepositWithdrawal
+}
+
+enum PurchaseType {
+    PURCHASE, SALES, DEPOSIT, WITHDRAWAL
+}
+
+enum TaxType {
+    TAXABLE, NON_TAXABLE
+}
+
+enum IssueStatus {
+    ISSUABLE, ISSUED, EXCLUDED
+}
+
+enum DebitCredit {
+    DEBIT, CREDIT
+}
+enum AccountChart {
+    ASSETS, LIABILITIES, EQUITY, REVENUE, EXPENSE
+}
+
+
+@enduml
