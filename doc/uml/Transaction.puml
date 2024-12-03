@@ -57,6 +57,7 @@ annotation MappedSuperClass as "MappedSuperClass" {
     annotation with AbstractTransaction
     annotation with AbstractTransactionItem
 }
+
 abstract class AbstractTransactionServiceImpl implements TransactionService, TransactionValidator, VoucherIssueService, TransactionIssueStatusService {
     # TransactionValidatorFactory transactionValidatorFactory : strategy
     # void validate(Transaction data);
@@ -68,7 +69,7 @@ abstract class AbstractTransactionServiceImpl implements TransactionService, Tra
 interface Journal {}
 interface Item {}
 
-interface Transaction<I extends Item, J extends Journal, V extends TransactionVoucher> {
+interface Transaction<I extends Item, J extends Journal, V extends Voucher> {
     + Long getId()
     + String getTransactionNo()
     + String getTransactionDate()
@@ -178,40 +179,25 @@ interface Journal {
     + int getOrder()
 }
 
-class TaxInvoiceJournal {
-    - Long id
-    - String journalNo
-    - AccountTitle accountTitle
-    - long amount
-    - TaxInvoice taxInvoice
-    - int order
+abstract class AbstractJournal<T extends Transaction> implements Journal {
+    # Long id
+    # String journalNo
+    # AccountTitle accountTitle
+    # long amount
+    # T transaction
+    # int order
 }
 
-class CreditCardJournal {
-    - Long id
-    - String journalNo
-    - AccountTitle accountTitle
-    - long amount
-    - CreditCard creditCard
-    - int order
+class TaxInvoiceJournal extends AbstractJournal<TaxInvoice> {
 }
 
-class CashReceiptJournal {
-    - Long id
-    - String journalNo
-    - AccountTitle accountTitle
-    - long amount
-    - CashReceipt cashReceipt
-    - int order
+class CreditCardJournal extends AbstractJournal<CreditCard> {
 }
 
-class DepositWithdrawalJournal {
-    - Long id
-    - String journalNo
-    - AccountTitle accountTitle
-    - long amount
-    - DepositWithdrawal depositWithdrawal
-    - int order
+class CashReceiptJournal extends AbstractJournal<CashReceipt> {
+}
+
+class DepositWithdrawalJournal extends AbstractJournal<DepositWithdrawal> {
 }
 
 interface Voucher {}
